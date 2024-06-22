@@ -7,8 +7,6 @@ const {token} = process.env;
 const axios = require('axios');
 const endPoint = 'https://forex-api.coin.z.com/public';
 const path = '/v1/ticker';
-let askRate;
-let objData;
 
 //Discord
 //--------------------------------------------------------------------------------------------------------------
@@ -27,15 +25,14 @@ client.on('messageCreate', message => {
   if (message.author.bot) {
     return;
   }
-
+  // ゴリ押しコードなので変更予定
   if (message.content == '!kawase') {
     axios.get(endPoint + path)
       .then(function (response) {
-        objData = response.data.data[0];
+        let usData = response.data.data[0].ask;
+        let euroData = response.data.data[1].ask;
+        let poundData = response.data.data[2].ask;
         let thistime = response.data.responsetime;
-        askRate = objData.ask;
-        console.log(askRate);
-        // message.channel.send('USDJPY: ' + askRate);
         message.channel.send(
           {
           embeds: [{
@@ -52,32 +49,15 @@ client.on('messageCreate', message => {
             url: "https://advance.quote.nomura.co.jp/meigara/nomura2/chart21.exe?template=users/nomura/xsdayR&mode=D&basequote=XJPY/8_D"
           },
           fields: [
-            {name: "USDJPY", value: "**1ドル " + askRate + "円**"},
+            {name: "USDJPY", value: "**1ドル " + usData + "円**"},
+            {name: "EURJPY", value: "**1ユーロ " + euroData + "円**"},
+            {name: "GBPJPY", value: "**1ポンド " + poundData + "円**"},
             {name: "", value: "[詳細GMO証券為替レート](https://www.click-sec.com/corp/guide/fxneo/rate/)"}
           ],
           color: 4303284,
           timestamp: thistime,
           }]
           }
-
-          /*
-          {embed: [{
-          author:{
-            name: "Hawaii Bot"
-          },
-          title: "現在のレート",
-          description: 'GMOコイン 外国為替FXの最新レートです',
-          timestamp: response.data.responsetime,
-          footer: {
-            text: "Developed by Risochaso"
-          },
-          fields:[
-            {
-              name: "USDJPY",
-              value: "USDJPY"
-            }
-          ]
-          }]}*/
         );
       })
       .catch(function (error) {
